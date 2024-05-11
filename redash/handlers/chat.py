@@ -4,6 +4,12 @@ from redash.handlers.base import (
 )
 import os
 from openai import OpenAI
+
+from langchain_community.utilities import SQLDatabase
+from langchain_community.agent_toolkits import create_sql_agent
+from langchain_openai import ChatOpenAI
+
+
 VARIABLE_KEY = os.environ.get("OPENAI_API_KEY")
 client = OpenAI(
   api_key=VARIABLE_KEY
@@ -35,3 +41,20 @@ class ChatWithYoutubeDatabase():
             print(db.dialect)
             print(db.get_usable_table_names())
             return db
+        except Exception as e:
+            print(e)
+    
+    def llm_connector(db):
+        try:
+            llm = ChatOpenAI(model='gpt-3.5-turbo',temperature=0)
+            agent_executor = create_sql_agent(llm,db=db,agent_type="openai-tools",verbose=True)
+            return agent_executor
+        except Exception as e:
+            print(e)
+    
+    def query_runner(query,agent_executor):
+        try:
+            result = agent_executor.invoke(query)
+            return result
+        except Exception as e:
+            print(e)
