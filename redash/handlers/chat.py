@@ -27,3 +27,11 @@ class ChatResource(BaseResource):
         except Exception as error:
             print(error)
             return jsonify({"error": "An error occurred"}), 500
+        
+class ChatWithYoutubeDatabase():
+    def get_db_connection(db_uri):
+        try:
+            db = SQLDatabase.from_uri(db_uri)
+            print(db.dialect)
+            print(db.get_usable_table_names())
+            return db
